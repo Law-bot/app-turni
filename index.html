@@ -78,10 +78,19 @@
   .glass-surface{ border:1px solid var(--cardline); backdrop-filter:var(--glassblur); -webkit-backdrop-filter:var(--glassblur); background:var(--soft); }
 
   /* ---------- header: nessuna barra, tutto sfondo continuo ---------- */
+  /* In cima resta trasparente (si fonde nello sfondo); appena si scorre
+     prende uno sfondo sfumato — altrimenti il contenuto sotto passa
+     "attraverso" il testo dell'header e sembrano sovrapporsi. */
   .hdr{
     flex:none; position:sticky; top:0; z-index:8;
     background:var(--headerbg);
     padding: calc(env(safe-area-inset-top) + 16px) 20px 6px;
+    transition: background .2s ease, box-shadow .2s ease, backdrop-filter .2s ease;
+  }
+  .hdr.scrolled{
+    background: color-mix(in srgb, var(--barsolid) 78%, transparent);
+    backdrop-filter: var(--glassblur); -webkit-backdrop-filter: var(--glassblur);
+    box-shadow: 0 1px 0 var(--line);
   }
   .hdr-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
   .hdr-title{ display:flex; align-items:baseline; gap:9px; min-width:0; }
@@ -1090,6 +1099,11 @@
   }
 
   function init() {
+    var hdrEl = document.querySelector('.hdr');
+    window.addEventListener('scroll', function () {
+      hdrEl.classList.toggle('scrolled', window.scrollY > 6);
+    }, { passive: true });
+
     document.getElementById('prevMonth').onclick = function () { goMonth(-1); };
     document.getElementById('nextMonth').onclick = function () { goMonth(1); };
     document.getElementById('todayBtn').onclick = goToday;
